@@ -6,21 +6,17 @@ using System;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public interface IClickable
-{
-    void OnClick();
-}
 
-public class Slime : MonoBehaviour, IClickable
+
+public class Slime : MonoBehaviour
 {
     public Button buttonInstance;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public bool isHard = false;
     float timeTillHard;
-    public GameObject slimeInstance;
-    private bool attemptedSuicide = false; //Remove this when done testing
+    public GameObject slimeInstance;//The current slime object
     public int colorNumber;
-    public static event Action<GameObject> OnSlimeClicked;
+    public static event Action<GameObject> OnSlimeClicked;//The event that despawns the slime
     Renderer renderer;
     private AudioSource audio;
     public Camera camera;
@@ -35,12 +31,14 @@ public class Slime : MonoBehaviour, IClickable
     void Awake()
     {
         audio = GetComponent<AudioSource>();
-        audio.Play();
+        audio.Play();//Plays enterance sound
         slimeInstance.SetActive(true);
-        timeTillHard = 3f;
+        timeTillHard = 3f;//Time until slime becomes hard       IMPORTANT FOR PLAYTESTING   
         colorNumber = UnityEngine.Random.Range(0, 5); 
         renderer = GetComponent<Renderer>();
         renderer.material.color = colors[0,colorNumber];
+
+        //Code that makes button's position on the canvas mirror the slime's position on the screen
         buttonRect = buttonInstance.GetComponent<RectTransform>();
         targetTransform = transform;
         buttonInstance.onClick.AddListener(SlimeWasClicked);
@@ -51,6 +49,7 @@ public class Slime : MonoBehaviour, IClickable
 
         // Set button position
         buttonRect.localPosition = localPos;
+        buttonInstance.onClick.AddListener(SlimeWasClicked);//Adds a listener that calls SlimeWasClicked when the corresponding button is clicked
 
         
     }
@@ -63,37 +62,26 @@ public class Slime : MonoBehaviour, IClickable
         {
             
             timeTillHard -= Time.deltaTime;
-            if(timeTillHard <= 1 && timeTillHard > 0 && ! attemptedSuicide)
-            {
-                attemptedSuicide = true;
-                if(UnityEngine.Random.Range(0, 2) == 1)
-                {
-                    OnSlimeClicked?.Invoke(slimeInstance);
-                }
-                
-            }
             if (timeTillHard <= 0)
             {
-                isHard = true;
+                isHard = true;//Changes color when hard
                 renderer.material.color = colors[1, colorNumber];
             }
             
         }
-        buttonInstance.onClick.AddListener(SlimeWasClicked);
+        
 
-        ClickScript.DidMouseClick +=  SlimeWasClicked;
+        
     }
-    public void OnClick()
-    {
-        Debug.Log("This shit actually works");
-    }
+
     public void SlimeWasClicked()
     {
 
-        Debug.Log("Was Clicked");
+        
         if(!isHard)
         {
-            OnSlimeClicked?.Invoke(slimeInstance);
+            OnSlimeClicked?.Invoke(slimeInstance);//Invokes the despawn method in sime spawner when a this is activated
+
         }
     }
 

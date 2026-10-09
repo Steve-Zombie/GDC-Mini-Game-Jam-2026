@@ -7,19 +7,19 @@ using UnityEngine.UI;
 public class SlimeSpawner : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public float time = 60f;
-    public float startTime = 60f;
-    public TextMeshProUGUI timerDisplay;
-    float nextSpawn;
-    float lastSpawn;
+    public float time = 60f; //Current time
+    public float startTime = 90f; //Starting time
+    public TextMeshProUGUI timerDisplay; //TextMeshPro text
+    float nextSpawn;//Next spawn time
+    float lastSpawn;//The time the last slime spawned
     AudioSource audio;
-    public GameObject slimePrefab;
-    public Button buttonPrefab;
-    [SerializeField] private Transform parentTransform;
+    public GameObject slimePrefab;//Original slime object
+    public Button buttonPrefab;//Buttin
+    [SerializeField] private Transform parentTransform; //Canvas object
     List<GameObject> slimes = new List<GameObject>();
     void Start()
     {
-        audio = GetComponent<AudioSource>();
+        audio = GetComponent<AudioSource>();//Plays the spawn sound
         time = startTime;
         lastSpawn = time; 
         nextSpawn = Random.Range(3f, 5f);
@@ -28,42 +28,55 @@ public class SlimeSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        time -= Time.deltaTime;
-        timerDisplay.text = Mathf.Floor(time).ToString() + "Slimes:" + slimes.Count.ToString();
-        Slime.OnSlimeClicked += DespawnSlime;
-        if (lastSpawn - time >= nextSpawn)
+        if (time >= 0.0f)
         {
-            bool canSpawn = false;
-            Vector3 spawnPosition = new Vector3(0f, 0f, 0f);
-            while(!canSpawn)
+            time -= Time.deltaTime;//Iterates over time
+            timerDisplay.text = Mathf.Floor(time).ToString();
+            Slime.OnSlimeClicked += DespawnSlime; //Adds despawnSlime method to OnSlimeClicked event
+            if (lastSpawn - time >= nextSpawn)
             {
-                float spawnX = Random.Range(-4f, 5.5f);
-                float spawnY = Random.Range(-2f, 3.5f);
-                canSpawn = true;
-                foreach (GameObject slime in slimes){
-                    if ( (slime.transform.position.x + 1f > spawnX && slime.transform.position.x - 1f < spawnX) && (slime.transform.position.y + 1f > spawnY && slime.transform.position.y - 1f < spawnY))
+                bool canSpawn = false;
+                Vector3 spawnPosition = new Vector3(0f, 0f, 0f);
+                while(!canSpawn)//Generates random position so long as it doesn't fall within another existing sime's radius
+                {
+                    float spawnX = Random.Range(-8.2f, 8.2f);//Range of possible x and y positions a slime can spawn in,        IMPORTANT FOR PLAYTESTING
+                    float spawnY = Random.Range(-4.5f, 4.5f);
+                    canSpawn = true;
+                    foreach (GameObject slime in slimes){
+                        if ( (slime.transform.position.x + 0.5f > spawnX && slime.transform.position.x - 0.5f < spawnX) && (slime.transform.position.y + 0.5f > spawnY && slime.transform.position.y - 0.5f < spawnY))
+                        {
+                            canSpawn = false;
+                        }
+                    }
+                    if (canSpawn)
                     {
-                        canSpawn = false;
+                        spawnPosition = new Vector3(spawnX, spawnY, 0f);
                     }
                 }
-                if (canSpawn)
-                {
-                    spawnPosition = new Vector3(spawnX, spawnY, 0f);
-                }
+                GameObject newSlime = Instantiate(slimePrefab, spawnPosition, transform.rotation);//Creates slime clone
+                Slime slimeScript = newSlime.GetComponent<Slime>();//Gets script from cloned slime
+                slimeScript.slimeInstance = newSlime;
+                slimeScript.buttonInstance = Instantiate(buttonPrefab, parentTransform);
+                newSlime.SetActive(true);//Activates new slime
+                slimes.Add(newSlime);
+                lastSpawn = time;
+                nextSpawn = startTime/time > 0.5f ? Random.Range(3f, 5f) : startTime/time > (5f/6f)? Random.Range(2f,3.5f): Random.Range(0.5f, 1f); //Changes the rate of spawn depending on what percentage of the total time is left    IMPORTANT FOR PLAY TESTING
             }
-            GameObject newSlime = Instantiate(slimePrefab, spawnPosition, transform.rotation);
-            Slime slimeScript = newSlime.GetComponent<Slime>();
-            slimeScript.slimeInstance = newSlime;
-            slimeScript.buttonInstance = Instantiate(buttonPrefab, parentTransform);
-            newSlime.SetActive(true);
-            slimes.Add(newSlime);
-            lastSpawn = time;
-            nextSpawn = startTime/time > 0.5f ? Random.Range(3f, 5f) : startTime/time > (5f/6f)? Random.Range(2f,3.5f): Random.Range(0.5f, 2f);
+        }
+        else//Win/lose at end of game
+        {
+            if (100f * ((float)slimes.Count/148f) >= 40)
+            {
+                //Lose
+            }
+            else
+            {
+                //Win
+            }
         }
     }
     void DespawnSlime(GameObject slime)
     {
-        Debug.Log("Slime Removed");
         audio.Play();
         slimes.Remove(slime);
         slime.SetActive(false);
