@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine.UI;
 
 public class SlimeSpawner : MonoBehaviour
 {
@@ -10,10 +12,14 @@ public class SlimeSpawner : MonoBehaviour
     public TextMeshProUGUI timerDisplay;
     float nextSpawn;
     float lastSpawn;
+    AudioSource audio;
     public GameObject slimePrefab;
+    public Button buttonPrefab;
+    [SerializeField] private Transform parentTransform;
     List<GameObject> slimes = new List<GameObject>();
     void Start()
     {
+        audio = GetComponent<AudioSource>();
         time = startTime;
         lastSpawn = time; 
         nextSpawn = Random.Range(3f, 5f);
@@ -23,7 +29,7 @@ public class SlimeSpawner : MonoBehaviour
     void Update()
     {
         time -= Time.deltaTime;
-        timerDisplay.text = Mathf.Floor(time).ToString();
+        timerDisplay.text = Mathf.Floor(time).ToString() + "Slimes:" + slimes.Count.ToString();
         Slime.OnSlimeClicked += DespawnSlime;
         if (lastSpawn - time >= nextSpawn)
         {
@@ -48,6 +54,7 @@ public class SlimeSpawner : MonoBehaviour
             GameObject newSlime = Instantiate(slimePrefab, spawnPosition, transform.rotation);
             Slime slimeScript = newSlime.GetComponent<Slime>();
             slimeScript.slimeInstance = newSlime;
+            slimeScript.buttonInstance = Instantiate(buttonPrefab, parentTransform);
             newSlime.SetActive(true);
             slimes.Add(newSlime);
             lastSpawn = time;
@@ -57,6 +64,7 @@ public class SlimeSpawner : MonoBehaviour
     void DespawnSlime(GameObject slime)
     {
         Debug.Log("Slime Removed");
+        audio.Play();
         slimes.Remove(slime);
         slime.SetActive(false);
     }
