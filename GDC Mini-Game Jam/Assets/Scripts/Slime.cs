@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using System;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections;
 
 
 
@@ -12,7 +13,7 @@ public class Slime : MonoBehaviour
 {
     public Button buttonInstance;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public bool isHard = false;
+    public bool isHard = false, spawned = false;
     float timeTillHard;
     public GameObject slimeInstance;//The current slime object
     public int colorNumber;
@@ -30,15 +31,68 @@ public class Slime : MonoBehaviour
     }
     void Awake()
     {
-        audio = GetComponent<AudioSource>();
-        audio.Play();//Plays enterance sound
         slimeInstance.SetActive(true);
-        timeTillHard = 3f;//Time until slime becomes hard       IMPORTANT FOR PLAYTESTING   
         colorNumber = UnityEngine.Random.Range(0, 5); 
         renderer = GetComponent<SpriteRenderer>();
         renderer.color = colors[0,colorNumber];
+        StartCoroutine(SlimeSpawn(1.5f, 1.7064f));
 
-        //Code that makes button's position on the canvas mirror the slime's position on the screen
+
+
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+        if (!isHard && spawned)
+        {
+            
+            timeTillHard -= Time.deltaTime;
+            if (timeTillHard <= 0)
+            {
+                isHard = true;//Changes color when hard
+                renderer.material.color = colors[1, colorNumber];
+            }
+            
+        }  
+    }
+    IEnumerator SlimeSpawn(float time, float targetSize)
+    {
+        Vector3 startSize = transform.localScale;
+        Vector3 endSize = Vector3.one * targetSize;
+        Vector3 startPos = transform.position;
+        startPos.y -= 2;
+        Vector3 endPos = transform.position;
+        endPos.y += 1;
+        Vector3 finalPos = transform.position;
+
+        float passedTime = 0f;
+        while (passedTime < time)
+        {
+            float t = passedTime / time;
+            transform.localScale = Vector3.Lerp(startSize, endSize, t);
+            if(passedTime < 1f)
+            {
+                transform.position = Vector3.Lerp(startPos, endPos, passedTime);
+            }
+            else
+            {
+                transform.position = Vector3.Lerp(endPos, finalPos, (passedTime - 1f)/ (time - 1f));
+            }
+            passedTime += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = endSize;
+        slimeHasSpawned();
+    }
+    public void slimeHasSpawned()
+    {
+        audio = GetComponent<AudioSource>();
+        audio.Play();//Plays enterance sound
+        timeTillHard = 3f;//Time until slime becomes hard       IMPORTANT FOR PLAYTESTING
+                //Code that makes button's position on the canvas mirror the slime's position on the screen
         buttonRect = buttonInstance.GetComponent<RectTransform>();
         targetTransform = transform;
         buttonInstance.onClick.AddListener(SlimeWasClicked);
@@ -49,28 +103,9 @@ public class Slime : MonoBehaviour
 
         // Set button position
         buttonRect.localPosition = localPos;
-        buttonInstance.onClick.AddListener(SlimeWasClicked);//Adds a listener that calls SlimeWasClicked when the corresponding button is clicked
+        buttonInstance.onClick.AddListener(SlimeWasClicked);//Adds a listener that calls SlimeWasClicked when the corresponding button is clicked   
 
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-        if (!isHard)
-        {
-            
-            timeTillHard -= Time.deltaTime;
-            if (timeTillHard <= 0)
-            {
-                isHard = true;//Changes color when hard
-                renderer.material.color = colors[1, colorNumber];
-            }
-            
-        }
-        
-
+        spawned = true;
         
     }
 
