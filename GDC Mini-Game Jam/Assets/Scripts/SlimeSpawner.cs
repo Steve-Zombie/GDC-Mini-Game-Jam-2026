@@ -60,7 +60,7 @@ public class SlimeSpawner : MonoBehaviour
                 newSlime.SetActive(true);//Activates new slime
                 slimes.Add(newSlime);
                 lastSpawn = time;
-                nextSpawn = startTime/time > 0.5f ? Random.Range(3f, 5f) : startTime/time > (5f/6f)? Random.Range(2f,3.5f): Random.Range(0.5f, 1f); //Changes the rate of spawn depending on what percentage of the total time is left    IMPORTANT FOR PLAY TESTING
+                nextSpawn = startTime/time > 0.5f ? Random.Range(1.5f, 2f) : startTime/time > (5f/6f)? Random.Range(0.75f,1.5f): Random.Range(0.3f, 0.75f); //Changes the rate of spawn depending on what percentage of the total time is left    IMPORTANT FOR PLAY TESTING
             }
         }
         else//Win/lose at end of game

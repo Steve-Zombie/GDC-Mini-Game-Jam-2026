@@ -17,7 +17,7 @@ public class Slime : MonoBehaviour
     public GameObject slimeInstance;//The current slime object
     public int colorNumber;
     public static event Action<GameObject> OnSlimeClicked;//The event that despawns the slime
-    Renderer renderer;
+    SpriteRenderer renderer;
     private AudioSource audio;
     public Camera camera;
     private RectTransform buttonRect;
@@ -35,8 +35,8 @@ public class Slime : MonoBehaviour
         slimeInstance.SetActive(true);
         timeTillHard = 3f;//Time until slime becomes hard       IMPORTANT FOR PLAYTESTING   
         colorNumber = UnityEngine.Random.Range(0, 5); 
-        renderer = GetComponent<Renderer>();
-        renderer.material.color = colors[0,colorNumber];
+        renderer = GetComponent<SpriteRenderer>();
+        renderer.color = colors[0,colorNumber];
 
         //Code that makes button's position on the canvas mirror the slime's position on the screen
         buttonRect = buttonInstance.GetComponent<RectTransform>();
