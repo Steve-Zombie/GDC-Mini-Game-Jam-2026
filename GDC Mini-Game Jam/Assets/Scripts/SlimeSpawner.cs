@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class SlimeSpawner : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public float time = 60f; //Current time
+    public float time = 90f; //Current time
     public float startTime = 90f; //Starting time
     public TextMeshProUGUI timerDisplay; //TextMeshPro text
     float nextSpawn;//Next spawn time
@@ -43,7 +43,7 @@ public class SlimeSpawner : MonoBehaviour
                     float spawnY = Random.Range(-4.5f, 4.5f);
                     canSpawn = true;
                     foreach (GameObject slime in slimes){
-                        if ( (slime.transform.position.x + 0.5f > spawnX && slime.transform.position.x - 0.5f < spawnX) && (slime.transform.position.y + 0.5f > spawnY && slime.transform.position.y - 0.5f < spawnY))
+                        if ( (slime.GetComponent<Slime>().truePosition.x + 0.5f > spawnX && slime.GetComponent<Slime>().truePosition.x - 0.5f < spawnX) && (slime.GetComponent<Slime>().truePosition.y + 0.5f > spawnY && slime.GetComponent<Slime>().truePosition.y - 0.5f < spawnY))
                         {
                             canSpawn = false;
                         }
@@ -60,7 +60,8 @@ public class SlimeSpawner : MonoBehaviour
                 newSlime.SetActive(true);//Activates new slime
                 slimes.Add(newSlime);
                 lastSpawn = time;
-                nextSpawn = startTime/time > 0.5f ? Random.Range(1.5f, 2f) : startTime/time > (5f/6f)? Random.Range(0.75f,1.5f): Random.Range(0.3f, 0.75f); //Changes the rate of spawn depending on what percentage of the total time is left    IMPORTANT FOR PLAY TESTING
+                nextSpawn = (startTime - time)/startTime < 0.5f ? (float)Random.Range(1.5f, 2f) : (startTime - time)/startTime < (5f/6f)? (float)Random.Range(0.75f,1.5f): (float)Random.Range(0.4f, 0.75f); //Changes the rate of spawn depending on what percentage of the total time is left    IMPORTANT FOR PLAY TESTING
+                //nextSpawn = Random.Range(0.1f, 2f); Alternative implimentation of random slime spawning
             }
         }
         else//Win/lose at end of game

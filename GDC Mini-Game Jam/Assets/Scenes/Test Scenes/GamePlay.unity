@@ -548,6 +548,7 @@ MonoBehaviour:
   slimeInstance: {fileID: 0}
   colorNumber: 0
   camera: {fileID: 1128136942}
+  truePosition: {x: 0, y: 0, z: 0}
 --- !u!58 &1122566481
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -870,7 +871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeSpawner
   time: 60
-  startTime: 60
+  startTime: 90
   timerDisplay: {fileID: 1428655845}
   slimePrefab: {fileID: 1122566477}
   buttonPrefab: {fileID: 1594015440}

@@ -23,6 +23,7 @@ public class Slime : MonoBehaviour
     public Camera camera;
     private RectTransform buttonRect;
     private Transform targetTransform;
+    public Vector3 truePosition;
     Color[,] colors = {{new Color(255f/255f, 0f, 0f, 1f), new Color(255f/255f, 0f, 170f/255f, 1f), new Color(0f/255f, 142f/255f, 255f/255f, 1f), new Color(0f/255f, 255f/255f, 47f/255f, 1f), new Color(241f/255f, 255f/255f, 71f/255f, 1f)}, {new Color(196f/255f, 69f/255f, 69f/255f, 1f), new Color(209f/255f, 92f/255f, 170f/255f, 1f), new Color(86f/255f, 149f/255f, 200f/255f, 1f), new Color(88f/255f, 198f/255f, 108f/255f, 1f), new Color(216f/255f, 255f/255f, 71f/255f, 1f)}};
 
     void Start()
@@ -35,6 +36,7 @@ public class Slime : MonoBehaviour
         colorNumber = UnityEngine.Random.Range(0, 5); 
         renderer = GetComponent<SpriteRenderer>();
         renderer.color = colors[0,colorNumber];
+        truePosition = transform.position;
         StartCoroutine(SlimeSpawn(1.5f, 1.7064f));
 
 
@@ -85,13 +87,14 @@ public class Slime : MonoBehaviour
             yield return null;
         }
         transform.localScale = endSize;
+        transform.position = finalPos;
         slimeHasSpawned();
     }
     public void slimeHasSpawned()
     {
         audio = GetComponent<AudioSource>();
         audio.Play();//Plays enterance sound
-        timeTillHard = 3f;//Time until slime becomes hard       IMPORTANT FOR PLAYTESTING
+        timeTillHard = 2f;//Time until slime becomes hard       IMPORTANT FOR PLAYTESTING
                 //Code that makes button's position on the canvas mirror the slime's position on the screen
         buttonRect = buttonInstance.GetComponent<RectTransform>();
         targetTransform = transform;
@@ -116,7 +119,8 @@ public class Slime : MonoBehaviour
         if(!isHard)
         {
             OnSlimeClicked?.Invoke(slimeInstance);//Invokes the despawn method in sime spawner when a this is activated
-
+            Destroy(buttonInstance);
+            Destroy(slimeInstance);
         }
     }
 
